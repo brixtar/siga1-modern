@@ -1,0 +1,18 @@
+#! frontend-expose.yaml
+# Generated code, do not edit
+apiVersion: v1
+kind: Service
+metadata:
+    name: frontend
+    namespace: siga1-modern
+    labels:
+        com.docker.compose.project: siga1-modern
+        com.docker.compose.service: frontend
+spec:
+    selector:
+        com.docker.compose.project: siga1-modern
+        com.docker.compose.service: frontend
+    ports:
+        - name: frontend-80
+          port: 80
+          targetPort: frontend-80

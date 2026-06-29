@@ -1,0 +1,32 @@
+#! frontend-deployment.yaml
+# Generated code, do not edit
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: frontend
+    namespace: siga1-modern
+    labels:
+        com.docker.compose.project: siga1-modern
+        com.docker.compose.service: frontend
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            com.docker.compose.project: siga1-modern
+            com.docker.compose.service: frontend
+    strategy:
+        type: Recreate
+    template:
+        metadata:
+            labels:
+                com.docker.compose.project: siga1-modern
+                com.docker.compose.service: frontend
+                com.docker.compose.network.default: "true"
+        spec:
+            containers:
+                - name: siga-frontend
+                  image: siga1-modern-frontend
+                  imagePullPolicy: IfNotPresent
+                  ports:
+                    - name: frontend-80
+                      containerPort: 80

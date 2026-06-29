@@ -1,0 +1,31 @@
+spring:
+  application:
+    name: siga-backend
+  datasource:
+    url: jdbc:mysql://localhost:3306/siga_db?useSSL=false&serverTimezone=America/Argentina/Buenos_Aires&allowPublicKeyRetrieval=true
+    username: root
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        format_sql: true
+    defer-datasource-initialization: true
+  sql:
+    init:
+      mode: never
+
+server:
+  port: 8080
+
+siga:
+  jwt:
+    secret: sigaSecretKeySuperSecureAndVeryLong32Chars!
+    expiration: 86400000
+
+cors:
+  allowed-origins: http://localhost:5173,http://localhost

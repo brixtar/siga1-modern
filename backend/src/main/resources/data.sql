@@ -1,0 +1,1 @@
+-- data.sql vacío: el usuario admin se crea via DataInitializer.java

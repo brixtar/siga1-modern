@@ -1,0 +1,37 @@
+# IDEs and editors
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Node / Frontend dependencies
+node_modules/
+dist/
+build/
+.npm
+/frontend/node_modules/
+/frontend/dist/
+
+# Java / Maven dependencies
+target/
+/backend/target/
+*.class
+*.jar
+*.war
+*.ear
+
+# Logs and temp files
+*.log
+*.tmp
+status.tmp
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Custom folders
+.qodo/
+.worktrees/
