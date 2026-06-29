@@ -73,11 +73,11 @@ public class AuditAspect {
                 username = auth.getName();
             }
 
-            // Serializar detalles simples
+            // Serializar detalles simples de forma segura sin disparar circularidad o N+1 queries
             String detalles = String.format("Metodo: %s. Parametros: %s", 
-                    methodName, Arrays.toString(args));
-            if (accion.equals("CREATE") || accion.equals("UPDATE")) {
-                detalles += " | Resultado: " + result.toString();
+                    methodName, getSafeArgsString(args));
+            if ((accion.equals("CREATE") || accion.equals("UPDATE")) && result != null) {
+                detalles += " | Resultado: " + getSafeEntityString(result);
             }
 
             Auditoria auditoria = Auditoria.builder()
@@ -98,5 +98,58 @@ public class AuditAspect {
         }
 
         return result;
+    }
+
+    private String getSafeArgsString(Object[] args) {
+        if (args == null) return "[]";
+        java.util.List<String> formattedArgs = new java.util.ArrayList<>();
+        for (Object arg : args) {
+            formattedArgs.add(getSafeEntityString(arg));
+        }
+        return formattedArgs.toString();
+    }
+
+    private String getSafeEntityString(Object entity) {
+        if (entity == null) return "null";
+        
+        if (entity instanceof java.util.Collection) {
+            java.util.Collection<?> col = (java.util.Collection<?>) entity;
+            java.util.List<String> items = new java.util.ArrayList<>();
+            for (Object obj : col) {
+                items.add(getSafeSingleEntityString(obj));
+            }
+            return items.toString();
+        }
+        
+        return getSafeSingleEntityString(entity);
+    }
+    
+    private String getSafeSingleEntityString(Object entity) {
+        if (entity == null) return "null";
+        
+        String packageName = entity.getClass().getPackageName();
+        if (packageName.startsWith("java.lang") || packageName.startsWith("java.time") || entity instanceof Number || entity instanceof Boolean) {
+            return entity.toString();
+        }
+        
+        if (packageName.startsWith("com.siga.entity")) {
+            Long id = null;
+            try {
+                java.lang.reflect.Method getIdMethod = entity.getClass().getMethod("getId");
+                Object idObj = getIdMethod.invoke(entity);
+                if (idObj instanceof Long) {
+                    id = (Long) idObj;
+                }
+            } catch (Exception ignored) {}
+            
+            String className = entity.getClass().getSimpleName();
+            return String.format("%s[id=%s]", className, id != null ? id : "null");
+        }
+        
+        try {
+            return entity.toString();
+        } catch (Exception e) {
+            return entity.getClass().getSimpleName();
+        }
     }
 }

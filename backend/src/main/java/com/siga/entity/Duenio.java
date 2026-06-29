@@ -4,7 +4,9 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "duenio")
+@Table(name = "duenio", indexes = {
+    @Index(name = "idx_duenio_dni", columnList = "dni")
+})
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

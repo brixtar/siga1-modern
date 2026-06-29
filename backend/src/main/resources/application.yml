@@ -2,13 +2,13 @@ spring:
   application:
     name: siga-backend
   datasource:
-    url: jdbc:mysql://localhost:3306/siga_db?useSSL=false&serverTimezone=America/Argentina/Buenos_Aires&allowPublicKeyRetrieval=true
-    username: root
-    password: root
+    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/siga_db?useSSL=false&serverTimezone=America/Argentina/Buenos_Aires&allowPublicKeyRetrieval=true}
+    username: ${SPRING_DATASOURCE_USERNAME:root}
+    password: ${SPRING_DATASOURCE_PASSWORD:root}
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:update}
     show-sql: true
     properties:
       hibernate:
@@ -17,15 +17,15 @@ spring:
     defer-datasource-initialization: true
   sql:
     init:
-      mode: never
+      mode: ${SPRING_SQL_INIT_MODE:never}
 
 server:
   port: 8080
 
 siga:
   jwt:
-    secret: sigaSecretKeySuperSecureAndVeryLong32Chars!
-    expiration: 86400000
+    secret: ${SIGA_JWT_SECRET:sigaSecretKeySuperSecureAndVeryLong32Chars!}
+    expiration: ${SIGA_JWT_EXPIRATION:86400000}
 
 cors:
-  allowed-origins: http://localhost:5173,http://localhost
+  allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173,http://localhost}

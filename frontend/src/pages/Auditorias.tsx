@@ -37,7 +37,7 @@ const Auditorias: React.FC = () => {
 
   useEffect(() => {
     const term = searchTerm.toLowerCase();
-    const filtered = auditorias.filter((audit) => 
+    const filtered = auditorias.filter((audit: Auditoria) => 
       audit.username.toLowerCase().includes(term) ||
       audit.accion.toLowerCase().includes(term) ||
       audit.tabla.toLowerCase().includes(term) ||
@@ -45,6 +45,38 @@ const Auditorias: React.FC = () => {
     );
     setFilteredData(filtered);
   }, [searchTerm, auditorias]);
+
+  const exportToCSV = () => {
+    if (filteredData.length === 0) return;
+    
+    const headers = ['Fecha y Hora', 'Usuario', 'Accion', 'Modulo', 'ID Registro', 'Detalles'];
+    
+    const rows = filteredData.map((audit: Auditoria) => [
+      new Date(audit.fecha).toLocaleString('es-ES'),
+      audit.username,
+      audit.accion,
+      audit.tabla,
+      audit.registroId ?? 'N/A',
+      (audit.detalles || '').replace(/"/g, '""')
+    ]);
+    
+    const csvContent = [
+      headers.join(','),
+      ...rows.map((row: any[]) => row.map((val: any) => `"${val}"`).join(','))
+    ].join('\r\n');
+    
+    // Blob con BOM UTF-8 para que Excel muestre tildes y caracteres especiales en español correctamente
+    const blob = new Blob([new Uint8Array([0xEF, 0xBB, 0xBF]), csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    
+    const nowStr = new Date().toISOString().slice(0, 10);
+    link.setAttribute('download', `auditoria_siga_${nowStr}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   const columns = [
     { 
@@ -107,14 +139,23 @@ const Auditorias: React.FC = () => {
             Logs de control médico y tracking de modificaciones.
           </p>
         </div>
-        <div className="w-full md:w-80">
-          <input
-            type="text"
-            placeholder="Buscar por usuario, acción, módulo..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 bg-white text-gray-800"
-          />
+        <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto items-stretch sm:items-center">
+          <button
+            onClick={exportToCSV}
+            disabled={filteredData.length === 0}
+            className="flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 disabled:hover:bg-emerald-600 text-white font-semibold px-4 py-2 rounded-lg text-sm shadow transition-colors"
+          >
+            <span>📥 Exportar CSV</span>
+          </button>
+          <div className="w-full md:w-80">
+            <input
+              type="text"
+              placeholder="Buscar por usuario, acción, módulo..."
+              value={searchTerm}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 bg-white text-gray-800"
+            />
+          </div>
         </div>
       </div>
 
