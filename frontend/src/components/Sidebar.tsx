@@ -46,7 +46,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
         }`}
       >
         <div className="flex items-center justify-center h-16 border-b dark:border-slate-800">
-          <span className="text-xl font-bold text-teal-600 dark:text-teal-400">SIGA</span>
+          <span className="text-xl font-bold text-teal-600 dark:text-teal-400">S.I.G.A.</span>
         </div>
         <nav className="mt-4">
           <ul>
