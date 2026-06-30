@@ -5,6 +5,7 @@ import { animalService } from '../services/animalService';
 import { consultaService } from '../services/consultaService';
 import { doctorService } from '../services/doctorService';
 import { medicamentoService } from '../services/medicamentoService';
+import api from '../services/api';
 import type { Medicamento } from '../types';
 
 interface Stats {
@@ -17,31 +18,35 @@ interface Stats {
 const Dashboard: React.FC = () => {
   const [stats, setStats] = useState<Stats>({ duenios: 0, animales: 0, consultas: 0, doctores: 0 });
   const [lowStockMeds, setLowStockMeds] = useState<Medicamento[]>([]);
+  const [vaccineAlerts, setVaccineAlerts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const loadStats = async () => {
+    try {
+      const [duenios, animales, consultas, doctores, lowStock, vacunasProx] = await Promise.all([
+        duenioService.getAll(),
+        animalService.getAll(),
+        consultaService.getAll(),
+        doctorService.getAll(),
+        medicamentoService.getLowStock(),
+        api.get<any[]>('/vacunas/alertas/proximas'),
+      ]);
+      setStats({
+        duenios: duenios.length,
+        animales: animales.length,
+        consultas: consultas.length,
+        doctores: doctores.length,
+      });
+      setLowStockMeds(lowStock);
+      setVaccineAlerts(vacunasProx.data);
+    } catch {
+      // Error handled silently
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const loadStats = async () => {
-      try {
-        const [duenios, animales, consultas, doctores, lowStock] = await Promise.all([
-          duenioService.getAll(),
-          animalService.getAll(),
-          consultaService.getAll(),
-          doctorService.getAll(),
-          medicamentoService.getLowStock(),
-        ]);
-        setStats({
-          duenios: duenios.length,
-          animales: animales.length,
-          consultas: consultas.length,
-          doctores: doctores.length,
-        });
-        setLowStockMeds(lowStock);
-      } catch {
-        // Error handled silently
-      } finally {
-        setLoading(false);
-      }
-    };
     loadStats();
   }, []);
 
@@ -80,6 +85,44 @@ const Dashboard: React.FC = () => {
           >
             Revisar Farmacia
           </Link>
+        </div>
+      )}
+
+      {vaccineAlerts.length > 0 && (
+        <div className="bg-teal-50 border-l-4 border-teal-500 p-4 mb-6 rounded shadow-sm flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+          <div className="flex items-center">
+            <span className="text-xl mr-3">🛡️</span>
+            <div>
+              <h3 className="text-sm font-semibold text-teal-800">Recordatorio de Próximas Vacunaciones</h3>
+              <p className="text-xs text-teal-700 mt-0.5">
+                Hay {vaccineAlerts.length} vacuna{vaccineAlerts.length > 1 ? 's' : ''} programada{vaccineAlerts.length > 1 ? 's' : ''} para vencer en los próximos 30 días.
+              </p>
+            </div>
+          </div>
+          <div className="flex gap-2">
+            <button
+              onClick={async () => {
+                try {
+                  const res = await api.post('/vacunas/alertas/procesar-manual');
+                  alert(res.data);
+                  const refreshed = await api.get<any[]>('/vacunas/alertas/proximas');
+                  setVaccineAlerts(refreshed.data);
+                } catch (err) {
+                  console.error(err);
+                  alert("Error al simular envío");
+                }
+              }}
+              className="text-xs font-semibold text-teal-800 hover:text-teal-950 px-3 py-1.5 bg-teal-100 hover:bg-teal-200 rounded border border-teal-200 transition-colors whitespace-nowrap"
+            >
+              📧 Simular Envío de Alertas
+            </button>
+            <Link
+              to="/animales"
+              className="text-xs font-semibold text-teal-800 hover:text-teal-950 px-3 py-1.5 bg-teal-100 hover:bg-teal-200 rounded border border-teal-200 transition-colors whitespace-nowrap"
+            >
+              Ver Pacientes
+            </Link>
+          </div>
         </div>
       )}
 

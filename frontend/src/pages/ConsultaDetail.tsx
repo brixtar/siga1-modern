@@ -168,6 +168,25 @@ const ConsultaDetail: React.FC = () => {
     }
   };
 
+  const downloadReceta = async () => {
+    if (!id) return;
+    try {
+      const response = await api.get(`/consultas/${id}/receta-pdf`, {
+        responseType: 'blob'
+      });
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `receta-consulta-${id}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    } catch (err) {
+      console.error("Error al descargar receta PDF", err);
+      alert("Error al descargar la receta en PDF. Guarde primero la consulta.");
+    }
+  };
+
   const input = (label: string, field: keyof Consulta, value?: string, multiline = false) => {
     const baseClass = "w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500";
     return (
@@ -325,9 +344,18 @@ const ConsultaDetail: React.FC = () => {
             {input('Indicaciones', 'indicaciones', consulta.indicaciones, true)}
 
             <div className="border-t border-gray-200 pt-6">
-              <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-                <span className="mr-2">💊</span> Medicamentos Prescritos
-              </h3>
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-lg font-semibold text-gray-800 flex items-center">
+                  <span className="mr-2">💊</span> Medicamentos Prescritos
+                </h3>
+                <button
+                  type="button"
+                  onClick={downloadReceta}
+                  className="flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-3 py-1.5 rounded text-xs shadow-sm transition"
+                >
+                  <span>📥 Descargar Receta PDF</span>
+                </button>
+              </div>
 
               {(!consulta.medicamentos || consulta.medicamentos.length === 0) ? (
                 <p className="text-sm text-gray-500 italic mb-4">No se han recetado medicamentos en esta consulta.</p>
@@ -510,6 +538,9 @@ const ConsultaDetail: React.FC = () => {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-2">
         <h1 className="text-2xl font-bold text-gray-800">Consulta #{consulta.id}</h1>
         <div className="flex space-x-2">
+          <button onClick={downloadReceta} className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded font-semibold text-sm transition flex items-center gap-1 shadow-sm">
+            <span>📥 Receta PDF</span>
+          </button>
           <button onClick={handleSave} disabled={saving} className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50">
             {saving ? 'Guardando...' : 'Guardar'}
           </button>

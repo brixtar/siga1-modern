@@ -41,12 +41,12 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
         />
       )}
       <aside
-        className={`fixed inset-y-0 left-0 z-30 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 ${
+        className={`fixed inset-y-0 left-0 z-30 w-64 bg-white dark:bg-slate-900 shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 border-r border-slate-100 dark:border-slate-800 ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
-        <div className="flex items-center justify-center h-16 border-b">
-          <span className="text-xl font-bold text-teal-600">SIGA</span>
+        <div className="flex items-center justify-center h-16 border-b dark:border-slate-800">
+          <span className="text-xl font-bold text-teal-600 dark:text-teal-400">SIGA</span>
         </div>
         <nav className="mt-4">
           <ul>
@@ -55,8 +55,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                 <Link
                   to={item.path}
                   onClick={onClose}
-                  className={`flex items-center px-6 py-3 text-slate-700 hover:bg-teal-50 hover:text-teal-600 transition-colors ${
-                    isActive(item.path) ? 'bg-teal-50 text-teal-600 border-r-4 border-teal-600' : ''
+                  className={`flex items-center px-6 py-3 text-slate-700 dark:text-slate-300 hover:bg-teal-50 dark:hover:bg-slate-800 hover:text-teal-600 dark:hover:text-teal-400 transition-colors ${
+                    isActive(item.path) ? 'bg-teal-50 dark:bg-slate-800/60 text-teal-600 dark:text-teal-400 border-r-4 border-teal-600 dark:border-teal-400' : ''
                   }`}
                 >
                   <span className="mr-3">{item.icon}</span>

@@ -8,6 +8,12 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Custom dark mode utility helpers to augment Tailwind functionality if needed */
+.dark body {
+  background-color: #0f172a; /* bg-slate-900 */
+  color: #f1f5f9; /* text-slate-100 */
+}
+
 /* Scrollbar styling */
 ::-webkit-scrollbar {
   width: 8px;

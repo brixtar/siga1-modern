@@ -8,6 +8,14 @@ Este documento consolida la arquitectura, diseño y medidas de control e ingenie
 
 **SIGA Modern** es una reconstrucción web full-stack de una aplicación de escritorio legacy (Java Swing) utilizada para la gestión clínica en entornos de medicina veterinaria y educación universitaria. El sistema modernizado provee accesibilidad multiusuario y control granular de roles para tres perfiles de usuarios (Administradores, Médicos Veterinarios y Alumnos), facilitando la co-asistencia médica sin comprometer la seguridad e integridad del historial clínico.
 
+### 1.1 Antecedentes y Créditos de la Versión Original
+
+> [!NOTE]
+> **Reconocimiento de Autoría y Trabajo de Origen:**
+> Este proyecto constituye una modernización tecnológica, reingeniería y rediseño completo del sistema **S.I.G.A. (Sistema de Gestión de Animales)**, desarrollado originalmente en el año 2023 por los autores **Lartigue Alejandro Gabriel** y **Luques Jorge Matías** bajo la tutoría del Lic. Diego Candelero para la **Universidad Nacional de La Rioja (UNLaR) - Sede Chamical**.
+> 
+> La presente investigación y desarrollo toma como base el relevamiento clínico y la especificación de requisitos originales del S.I.G.A., enfocándose en la migración de su interfaz de escritorio Java 8 (Swing) y base de datos relacional MySQL a un entorno web moderno, desacoplado, seguro y contenerizado bajo estándares contemporáneos.
+
 ---
 
 ## 2. Arquitectura de Software
@@ -130,6 +138,20 @@ erDiagram
         String tabla
         LocalDateTime fecha
     }
+    PESO_REGISTRO {
+        Long id PK
+        Long animal_id FK
+        LocalDate fecha
+        Double peso
+    }
+    VACUNA_ALERTA {
+        Long id PK
+        Long animal_id FK
+        String nombre_vacuna
+        LocalDate fecha_aplicacion
+        LocalDate fecha_proxima
+        String estado
+    }
 
     USERS ||--o| DOCTOR : "asociado_a"
     USERS ||--o| ALUMNO : "asociado_a"
@@ -137,6 +159,8 @@ erDiagram
     ANIMAL ||--o{ CONSULTA : "recibe"
     DOCTOR ||--o{ CONSULTA : "atiende"
     ALUMNO ||--o{ CONSULTA : "asiste"
+    ANIMAL ||--o{ PESO_REGISTRO : "registra"
+    ANIMAL ||--o{ VACUNA_ALERTA : "programa"
 ```
 
 ### Optimización por Índices (JPA Indexing)
@@ -153,3 +177,21 @@ Se agregaron índices estructurados para optimizar el rendimiento de las consult
 1.  **Mitigación de XSS (Cookies HttpOnly):** El JWT no se almacena en el `localStorage` del navegador (donde es vulnerable a scripts inyectados), sino en una cookie HTTP con las flags `HttpOnly` y `Secure`, haciendo que sea inaccesible mediante JavaScript.
 2.  **Protección de Stock en Concurrencia (Farmacia):** La deducción de medicamentos prescritos se efectúa en un bloque transaccional controlado por JPA en el backend, evitando inconsistencias de stock (double-spending del inventario).
 3.  **Filtro AOP Seguro:** El aspecto de auditoría implementa inspección segura de tipos (`getSafeEntityString`) para evitar bucles de serialización y N+1 query loops comunes al invocar `.toString()` sobre proxies perezosos (Lazy proxies) de Hibernate.
+
+---
+
+## 7. Módulos Avanzados de Ingeniería (Fase 2)
+
+### A. Motor de Generación de Recetas Médicas (PDF)
+El sistema integra **OpenPDF** en el backend para compilar recetas médicas en formato PDF oficial en tiempo de ejecución. 
+*   **Aislamiento de Carga:** El controlador REST recibe la consulta, delega la composición del canvas a `RecetaPdfService` y transmite un flujo binario directo (`byte[]`) con headers `content-disposition` específicos, evitando guardar archivos temporales en disco que consuman almacenamiento de servidor.
+*   **Formato Académico:** Estructurado mediante tablas encajadas con bordes delgados, uso de paleta de colores corporativa (Teal) y bloques específicos para la firma digital del médico a cargo.
+
+### B. Módulo de Evolución de Peso (SVG Reactivo)
+Soporta el seguimiento clínico del desarrollo físico del animal:
+*   **Tratamiento de Datos:** La entidad `PesoRegistro` almacena las lecturas históricas. Al registrar un peso, se dispara un listener de servicio que actualiza de manera coherente el campo estático `peso` en la ficha general de `Animal`, sincronizando el historial clínico.
+*   **Representación Visual Interactiva:** Diseñado en el cliente a través de un renderizado SVG reactivo que calcula de manera dinámica los puntos en base al peso mínimo y máximo del animal (`viewBox`), evitando el uso de librerías externas pesadas y optimizando la velocidad de carga de la página.
+
+### C. Alertas de Vacunación y Planificación Asíncrona (Cron Job)
+*   **Planificador Asíncrono:** Utiliza la infraestructura `@EnableScheduling` de Spring Framework. A través de la anotación `@Scheduled`, el sistema ejecuta un barrido diario (`cron = "0 0 0 * * ?"`) buscando alertas en estado `PENDIENTE` cuya fecha de refuerzo esté a 3 días o menos.
+*   **Simulador de Correo Electrónico:** Dado el contexto educativo, el sistema expone un disparador manual a través del endpoint `/api/v1/vacunas/alertas/procesar-manual` para que los estudiantes y evaluadores ejecuten el flujo a demanda, imprimiendo en la consola del servidor (logs de Docker) la cabecera completa del correo simulado enviado al propietario y actualizando el estado de la alerta a `ENVIADO`.
