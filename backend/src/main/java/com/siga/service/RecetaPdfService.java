@@ -39,29 +39,35 @@ public class RecetaPdfService {
             document.open();
 
             // Fuentes
-            Font headerFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 20, new Color(13, 148, 136)); // Teal
-            Font subHeaderFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 12, Color.DARK_GRAY);
+            Font headerFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 16, new Color(26, 54, 93)); // Navy Blue
+            Font subHeaderFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 11, new Color(74, 85, 104)); // Dark Gray/Slate
+            Font titleDocFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 13, new Color(2, 132, 199)); // Sky Blue
             Font regularBold = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 9, Color.BLACK);
             Font regularText = FontFactory.getFont(FontFactory.HELVETICA, 9, Color.BLACK);
             Font footerFont = FontFactory.getFont(FontFactory.HELVETICA_OBLIQUE, 8, Color.GRAY);
 
-            // Cabecera Principal
-            Paragraph title = new Paragraph("SIGA - SISTEMA DE GESTIÓN VETERINARIA", headerFont);
+            // Cabecera Principal - Identidad UNLaR
+            Paragraph title = new Paragraph("UNIVERSIDAD NACIONAL DE LA RIOJA", headerFont);
             title.setAlignment(Element.ALIGN_CENTER);
-            title.setSpacingAfter(5);
+            title.setSpacingAfter(2);
             document.add(title);
 
-            Paragraph subtitle = new Paragraph("Hospital Veterinario Universitario - Receta Médica Oficial", subHeaderFont);
+            Paragraph subtitle = new Paragraph("Sede Regional Chamical — Hospital Veterinario Universitario", subHeaderFont);
             subtitle.setAlignment(Element.ALIGN_CENTER);
-            subtitle.setSpacingAfter(20);
+            subtitle.setSpacingAfter(4);
             document.add(subtitle);
 
-            // Separador Teal
+            Paragraph docTitle = new Paragraph("RECETA MÉDICA OFICIAL", titleDocFont);
+            docTitle.setAlignment(Element.ALIGN_CENTER);
+            docTitle.setSpacingAfter(15);
+            document.add(docTitle);
+
+            // Separador Navy Blue
             PdfPTable separator = new PdfPTable(1);
             separator.setWidthPercentage(100);
             PdfPCell sepCell = new PdfPCell();
             sepCell.setBorder(Rectangle.NO_BORDER);
-            sepCell.setBackgroundColor(new Color(13, 148, 136));
+            sepCell.setBackgroundColor(new Color(26, 54, 93));
             sepCell.setFixedHeight(3f);
             separator.addCell(sepCell);
             separator.setSpacingAfter(15);
@@ -118,7 +124,7 @@ public class RecetaPdfService {
             document.add(infoTable);
 
             // Tabla 2: Ficha del Paciente y Propietario
-            Paragraph secPatient = new Paragraph("DATOS DEL PACIENTE", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 10, new Color(13, 148, 136)));
+            Paragraph secPatient = new Paragraph("DATOS DEL PACIENTE", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 10, new Color(26, 54, 93)));
             secPatient.setSpacingAfter(5);
             document.add(secPatient);
 
@@ -157,7 +163,7 @@ public class RecetaPdfService {
             document.add(patientTable);
 
             // Tabla 3: Medicamentos Prescritos
-            Paragraph secMeds = new Paragraph("MEDICAMENTOS PRESCRITOS", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 10, new Color(13, 148, 136)));
+            Paragraph secMeds = new Paragraph("MEDICAMENTOS PRESCRITOS", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 10, new Color(26, 54, 93)));
             secMeds.setSpacingAfter(5);
             document.add(secMeds);
 
@@ -189,7 +195,7 @@ public class RecetaPdfService {
 
             // Indicaciones Adicionales
             if (consulta.getIndicaciones() != null && !consulta.getIndicaciones().trim().isEmpty()) {
-                Paragraph secIndic = new Paragraph("INDICACIONES ADICIONALES", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 10, new Color(13, 148, 136)));
+                Paragraph secIndic = new Paragraph("INDICACIONES ADICIONALES", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 10, new Color(26, 54, 93)));
                 secIndic.setSpacingAfter(5);
                 document.add(secIndic);
 

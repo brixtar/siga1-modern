@@ -16,7 +16,7 @@ const Animales: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<Animal | null>(null);
-  const [form, setForm] = useState<Partial<Animal>>({ sexo: 'DESCONOCIDO' });
+  const [form, setForm] = useState<Partial<Animal>>({ sexo: 'DESCONOCIDO', tipo: 'PEQUENIO' });
 
   const { hasRole } = useAuth();
   const canModify = hasRole('ADMIN') || hasRole('DOCTOR');
@@ -279,7 +279,7 @@ const Animales: React.FC = () => {
       }
       setShowForm(false);
       setEditing(null);
-      setForm({ sexo: 'DESCONOCIDO' });
+      setForm({ sexo: 'DESCONOCIDO', tipo: 'PEQUENIO' });
       load();
     } catch {
       alert('Error al guardar');
@@ -324,7 +324,7 @@ const Animales: React.FC = () => {
         </div>
         {canModify && (
           <button
-            onClick={() => { setShowForm(true); setEditing(null); setForm({ sexo: 'DESCONOCIDO' }); }}
+            onClick={() => { setShowForm(true); setEditing(null); setForm({ sexo: 'DESCONOCIDO', tipo: 'PEQUENIO' }); }}
             className="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition shadow-sm"
           >
             Nuevo Animal
@@ -398,6 +398,18 @@ const Animales: React.FC = () => {
                 <option value="MACHO">Macho</option>
                 <option value="HEMBRA">Hembra</option>
                 <option value="DESCONOCIDO">Desconocido</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Tipo de Animal</label>
+              <select
+                value={form.tipo || 'PEQUENIO'}
+                onChange={(e) => setForm({ ...form, tipo: e.target.value as 'PEQUENIO' | 'GRANDE' })}
+                className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                required
+              >
+                <option value="PEQUENIO">Pequeño (Mascota / Ave)</option>
+                <option value="GRANDE">Grande (Ganado / Equino)</option>
               </select>
             </div>
             <div>

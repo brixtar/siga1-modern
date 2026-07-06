@@ -41,7 +41,7 @@ const Navbar: React.FC<NavbarProps> = ({ onMenuClick }) => {
         <div className="flex items-center gap-3">
           <span className="text-xl lg:hidden font-bold text-teal-600 dark:text-teal-400 tracking-wider">S.I.G.A.</span>
           <h2 className="text-base lg:text-lg font-bold text-slate-800 dark:text-slate-100 hidden sm:block lg:ml-2">
-            S.I.G.A. - Sistema de Gestión de Animales
+            Hospital Veterinario Universitario - UNLaR
           </h2>
         </div>
 

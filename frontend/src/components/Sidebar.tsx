@@ -45,8 +45,9 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
           isOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
-        <div className="flex items-center justify-center h-16 border-b dark:border-slate-800">
-          <span className="text-xl font-bold text-teal-600 dark:text-teal-400">S.I.G.A.</span>
+        <div className="flex items-center justify-center h-16 border-b dark:border-slate-800 flex-col">
+          <span className="text-base font-extrabold text-teal-600 dark:text-teal-400 tracking-wider">S.I.G.A. UNLaR</span>
+          <span className="text-[9px] text-slate-400 font-bold tracking-tight uppercase">Sede Chamical</span>
         </div>
         <nav className="mt-4">
           <ul>
