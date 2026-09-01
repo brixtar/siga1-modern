@@ -7,10 +7,26 @@ services:
     plan: free
     region: oregon
     envVars:
-      - key: SPRING_DATASOURCE_URL
+      - key: DB_HOST
         fromDatabase:
           name: siga-db
-          property: jdbcConnectionString
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: siga-db
+          property: port
+      - key: DB_NAME
+        fromDatabase:
+          name: siga-db
+          property: database
+      - key: DB_USER
+        fromDatabase:
+          name: siga-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: siga-db
+          property: password
       - key: SPRING_JPA_HIBERNATE_DDL_AUTO
         value: update
       - key: SIGA_JWT_SECRET
