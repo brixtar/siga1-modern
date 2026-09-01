@@ -1,19 +1,20 @@
-FROM eclipse-temurin:21-jdk-alpine AS builder
-
+# Stage 1: Build Spring Boot jar
+FROM maven:3.9.6-eclipse-temurin-21-alpine AS builder
 WORKDIR /app
-
 COPY pom.xml .
 COPY src ./src
+RUN mvn clean package -DskipTests
 
-RUN apk add --no-cache maven && \
-    mvn clean package -DskipTests
-
-FROM eclipse-temurin:21-jdk-alpine
-
+# Stage 2: Production JRE runtime
+FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
+
+RUN addgroup -S siga && adduser -S siga -G siga
+USER siga:siga
 
 COPY --from=builder /app/target/*.jar app.jar
 
+ENV PORT=8080
 EXPOSE 8080
 
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["sh", "-c", "exec java -Dserver.port=${PORT:-8080} -jar app.jar"]
