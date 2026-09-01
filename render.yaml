@@ -8,14 +8,20 @@ services:
     region: oregon
     envVars:
       - key: SPRING_DATASOURCE_URL
-        sync: false # Ej: jdbc:mysql://host:3306/siga_db?useSSL=true&allowPublicKeyRetrieval=true
-      - key: SPRING_DATASOURCE_USERNAME
-        sync: false
-      - key: SPRING_DATASOURCE_PASSWORD
-        sync: false
+        fromDatabase:
+          name: siga-db
+          property: jdbcConnectionString
       - key: SPRING_JPA_HIBERNATE_DDL_AUTO
         value: update
       - key: SIGA_JWT_SECRET
         generateValue: true
       - key: JAVA_TOOL_OPTIONS
         value: "-Xms128m -Xmx384m -XX:+UseG1GC"
+
+databases:
+  # Base de datos PostgreSQL Gratuita en Render (Creada automáticamente)
+  - name: siga-db
+    databaseName: siga_db
+    user: siga
+    plan: free
+    region: oregon
