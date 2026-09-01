@@ -25,7 +25,7 @@ FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
 
 # Non-root user for security
-RUN addgroup -S siga && adduser -S siga -G siga
+RUN addgroup -S siga && adduser -S siga -G siga && mkdir -p /app/uploads && chown -R siga:siga /app
 USER siga:siga
 
 COPY --from=backend-builder /app/backend/target/*.jar app.jar
