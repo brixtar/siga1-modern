@@ -15,16 +15,22 @@ import java.util.UUID;
 @Slf4j
 public class StorageService {
 
-    private final Path rootLocation = Paths.get("uploads");
+    private Path rootLocation = Paths.get("uploads");
 
     @PostConstruct
     public void init() {
         try {
             Files.createDirectories(rootLocation);
             log.info("[StorageService] Directorio de carga inicializado en: {}", rootLocation.toAbsolutePath());
-        } catch (IOException e) {
-            log.error("[StorageService] No se pudo crear el directorio de carga", e);
-            throw new RuntimeException("Could not initialize storage location", e);
+        } catch (Exception e) {
+            log.warn("[StorageService] No se pudo crear el directorio de carga local, usando directorio temporal: {}", e.getMessage());
+            try {
+                this.rootLocation = Paths.get(System.getProperty("java.io.tmpdir"), "uploads");
+                Files.createDirectories(this.rootLocation);
+                log.info("[StorageService] Directorio de carga temporal inicializado en: {}", this.rootLocation.toAbsolutePath());
+            } catch (Exception ex) {
+                log.error("[StorageService] Advertencia al crear directorio temporal de uploads", ex);
+            }
         }
     }
 

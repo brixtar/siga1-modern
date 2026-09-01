@@ -25,10 +25,12 @@ FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
 
 # Non-root user for security
-RUN addgroup -S siga && adduser -S siga -G siga
-USER siga:siga
+RUN addgroup -S siga && adduser -S siga -G siga && mkdir -p /app/uploads && chown -R siga:siga /app
 
 COPY --from=backend-builder /app/backend/target/*.jar app.jar
+RUN chown siga:siga /app/app.jar
+
+USER siga:siga
 
 ENV PORT=8080
 EXPOSE 8080
