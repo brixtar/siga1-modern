@@ -6,29 +6,143 @@ body {
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  @apply bg-slate-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100 transition-colors duration-300;
 }
 
-/* Custom dark mode utility helpers to augment Tailwind functionality if needed */
-.dark body {
-  background-color: #0f172a; /* bg-slate-900 */
-  color: #f1f5f9; /* text-slate-100 */
+/* Global input overrides to make all forms automatically premium */
+@layer base {
+  input[type="text"], 
+  input[type="password"], 
+  input[type="email"], 
+  input[type="number"], 
+  input[type="search"], 
+  input[type="tel"], 
+  input[type="date"], 
+  input[type="time"], 
+  select, 
+  textarea {
+    @apply w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white/70 dark:bg-slate-900/70 text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 dark:focus:border-teal-400 focus:bg-white dark:focus:bg-slate-900 transition-all duration-200 shadow-sm;
+  }
+
+  label {
+    @apply block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5;
+  }
+}
+
+/* Custom visual utilities */
+@layer utilities {
+  .premium-card {
+    @apply bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border border-slate-100/50 dark:border-slate-800/80 rounded-2xl shadow-sm dark:shadow-2xl hover:shadow-md dark:hover:shadow-teal-950/10 transition-all duration-300;
+  }
+  
+  .glass-panel {
+    @apply bg-white/75 dark:bg-slate-900/75 backdrop-blur-lg border border-white/20 dark:border-slate-800/50 rounded-2xl shadow-2xl;
+  }
+
+  .premium-glow-teal {
+    box-shadow: 0 0 25px -5px rgba(20, 184, 166, 0.15), 0 0 15px -5px rgba(20, 184, 166, 0.05);
+  }
+
+  .premium-gradient-bg {
+    background: radial-gradient(circle at 10% 20%, rgba(20, 184, 166, 0.04) 0%, transparent 45%),
+                radial-gradient(circle at 90% 80%, rgba(59, 130, 246, 0.04) 0%, transparent 45%);
+  }
 }
 
 /* Scrollbar styling */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  @apply bg-transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
-  border-radius: 4px;
+  @apply bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 rounded-full transition-colors;
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: #a8a8a8;
+/* Force uniform padding, borders and border radius globally across all CRUD inputs */
+input[type="text"], 
+input[type="password"], 
+input[type="email"], 
+input[type="number"], 
+input[type="search"], 
+input[type="tel"], 
+input[type="date"], 
+input[type="time"], 
+select, 
+textarea {
+  border-radius: 0.75rem !important; /* rounded-xl */
+  padding: 0.625rem 1rem !important; /* px-4 py-2.5 */
+}
+
+/* Force dark mode color overrides to resolve contrast issues */
+.dark input[type="text"], 
+.dark input[type="password"], 
+.dark input[type="email"], 
+.dark input[type="number"], 
+.dark input[type="search"], 
+.dark input[type="tel"], 
+.dark input[type="date"], 
+.dark input[type="time"], 
+.dark select, 
+.dark textarea {
+  background-color: rgba(15, 23, 42, 0.85) !important; /* bg-slate-900/85 */
+  color: rgb(241, 245, 249) !important; /* text-slate-100 */
+  border-color: rgba(51, 65, 85, 0.5) !important; /* border-slate-700/50 */
+}
+
+.dark label {
+  color: rgb(148, 163, 184) !important; /* text-slate-400 */
+}
+
+/* --- GLOBAL DARK MODE HARDENING & CONTRAST PATCHES --- */
+
+/* Patch all hardcoded light background containers to dark slate in dark mode */
+.dark .bg-white {
+  background-color: rgba(15, 23, 42, 0.85) !important; /* bg-slate-900/85 */
+}
+
+.dark .bg-gray-50 {
+  background-color: rgba(30, 41, 59, 0.4) !important; /* bg-slate-800/40 */
+}
+
+/* Patch all hardcoded light borders to slate borders in dark mode */
+.dark .border-gray-100,
+.dark .border-gray-150,
+.dark .border-gray-200,
+.dark .border-gray-300,
+.dark .border-slate-100 {
+  border-color: rgba(51, 65, 85, 0.5) !important; /* border-slate-700/50 */
+}
+
+/* Patch all hardcoded dark text to off-white in dark mode to ensure perfect readability */
+.dark h1,
+.dark h2,
+.dark h3,
+.dark h4,
+.dark h5,
+.dark h6 {
+  color: rgb(241, 245, 249) !important; /* slate-100 */
+}
+
+.dark .text-gray-800,
+.dark .text-slate-800,
+.dark .text-gray-700,
+.dark .text-slate-700,
+.dark .text-gray-600,
+.dark .text-slate-600 {
+  color: rgb(226, 232, 240) !important; /* slate-200 */
+}
+
+.dark .text-gray-500,
+.dark .text-slate-500 {
+  color: rgb(148, 163, 184) !important; /* slate-400 */
+}
+
+.dark .text-gray-400,
+.dark .text-slate-400 {
+  color: rgb(100, 116, 139) !important; /* slate-500 */
 }

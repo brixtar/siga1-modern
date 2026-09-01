@@ -27,8 +27,27 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     localStorage.setItem('theme', theme);
   }, [theme]);
 
+  // Listen to system preference changes dynamically
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleChange = (e: MediaQueryListEvent) => {
+      const manual = localStorage.getItem('theme_manual');
+      if (!manual) {
+        setTheme(e.matches ? 'dark' : 'light');
+      }
+    };
+    
+    // Modern browsers
+    mediaQuery.addEventListener('change', handleChange);
+    return () => mediaQuery.removeEventListener('change', handleChange);
+  }, []);
+
   const toggleTheme = () => {
-    setTheme((prev) => (prev === 'light' ? 'dark' : 'light'));
+    setTheme((prev) => {
+      const next = prev === 'light' ? 'dark' : 'light';
+      localStorage.setItem('theme_manual', 'true');
+      return next;
+    });
   };
 
   return (

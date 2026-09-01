@@ -6,16 +6,20 @@
 *.njsproj
 *.sln
 *.sw?
+.qodo/
+.worktrees/
+.obsidian/
+Cerebro/
 
-# Node / Frontend dependencies
+# Node / Frontend dependencies & build
 node_modules/
 dist/
 build/
-.npm
+.npm/
 /frontend/node_modules/
 /frontend/dist/
 
-# Java / Maven dependencies
+# Java / Maven dependencies & build
 target/
 /backend/target/
 *.class
@@ -26,12 +30,22 @@ target/
 # Logs and temp files
 *.log
 *.tmp
+*.rar
+*.zip
+*.7z
+*.tar.gz
 status.tmp
+*_url.txt
+pinggy_url.txt
+tunnel_url.txt
+health-check.log
+
+# Environment files
+.env
+.env.local
+.env.*.local
 
 # OS files
 .DS_Store
 Thumbs.db
 
-# Custom folders
-.qodo/
-.worktrees/

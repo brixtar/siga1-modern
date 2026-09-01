@@ -7,10 +7,14 @@ import com.siga.dto.RegisterRequest;
 import com.siga.entity.User;
 import com.siga.config.JwtUtils;
 import com.siga.service.AuthService;
+import com.siga.security.UserDetailsImpl;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -23,6 +27,33 @@ public class AuthController {
     @Autowired
     private JwtUtils jwtUtils;
 
+    @Value("${siga.jwt.cookie-secure:false}")
+    private boolean cookieSecure;
+
+    @GetMapping("/me")
+    public ResponseEntity<?> getMe(Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated() || authentication.getName().equals("anonymousUser")) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponse("Not authenticated"));
+        }
+        
+        Object principal = authentication.getPrincipal();
+        if (principal instanceof UserDetailsImpl userDetails) {
+            java.util.List<String> roles = userDetails.getAuthorities().stream()
+                    .map(a -> a.getAuthority().replace("ROLE_", ""))
+                    .toList();
+            return ResponseEntity.ok(new LoginResponse(
+                null,
+                userDetails.getId(),
+                userDetails.getUsername(),
+                userDetails.getEmail(),
+                roles,
+                userDetails.getPuedeVerAuditoria()
+            ));
+        }
+        
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponse("Invalid session"));
+    }
+
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request, jakarta.servlet.http.HttpServletResponse response) {
         LoginResponse loginResponse = authService.authenticate(request);
@@ -33,7 +64,7 @@ public class AuthController {
         );
         jakarta.servlet.http.Cookie cookie = new jakarta.servlet.http.Cookie("siga_token", jwt);
         cookie.setHttpOnly(true);
-        cookie.setSecure(false); // set false for local development
+        cookie.setSecure(cookieSecure);
         cookie.setPath("/");
         cookie.setMaxAge(24 * 60 * 60); // 24 hours
         response.addCookie(cookie);
@@ -48,7 +79,7 @@ public class AuthController {
     public ResponseEntity<?> logout(jakarta.servlet.http.HttpServletResponse response) {
         jakarta.servlet.http.Cookie cookie = new jakarta.servlet.http.Cookie("siga_token", null);
         cookie.setHttpOnly(true);
-        cookie.setSecure(false);
+        cookie.setSecure(cookieSecure);
         cookie.setPath("/");
         cookie.setMaxAge(0); // Immediately expire the cookie
         response.addCookie(cookie);

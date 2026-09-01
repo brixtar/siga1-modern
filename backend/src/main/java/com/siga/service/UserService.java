@@ -1,35 +1,51 @@
 package com.siga.service;
 
+import com.siga.dto.UserDto;
 import com.siga.entity.User;
 import com.siga.exception.ResourceNotFoundException;
 import com.siga.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class UserService {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    public List<User> findAll() {
-        return userRepository.findAll();
+    private UserDto toDto(User user) {
+        if (user == null) return null;
+        return UserDto.builder()
+                .id(user.getId())
+                .username(user.getUsername())
+                .email(user.getEmail())
+                .role(user.getRole())
+                .enabled(user.getEnabled())
+                .puedeVerAuditoria(user.getPuedeVerAuditoria())
+                .createdAt(user.getCreatedAt())
+                .build();
     }
 
-    public User findById(Long id) {
-        return userRepository.findById(id)
+    public List<UserDto> findAll() {
+        return userRepository.findAll().stream()
+                .map(this::toDto)
+                .collect(Collectors.toList());
+    }
+
+    public UserDto findById(Long id) {
+        User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found: " + id));
+        return toDto(user);
     }
 
     @Transactional
-    public User update(Long id, User userData) {
+    public UserDto update(Long id, UserDto userData) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found: " + id));
         user.setUsername(userData.getUsername());
@@ -48,7 +64,9 @@ public class UserService {
         if (userData.getPassword() != null && !userData.getPassword().isBlank()) {
             user.setPassword(passwordEncoder.encode(userData.getPassword()));
         }
-        return userRepository.save(user);
+        
+        User savedUser = userRepository.save(user);
+        return toDto(savedUser);
     }
 
     @Transactional

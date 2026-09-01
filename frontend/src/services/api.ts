@@ -1,7 +1,11 @@
 import axios from 'axios';
 
+const apiBase = import.meta.env.VITE_API_URL 
+  ? `${import.meta.env.VITE_API_URL.replace(/\/$/, '')}/api/v1` 
+  : '/api/v1';
+
 const api = axios.create({
-  baseURL: '/api/v1',
+  baseURL: apiBase,
   withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
@@ -25,7 +29,13 @@ api.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       localStorage.removeItem('siga_token');
-      window.location.href = '/login';
+      localStorage.removeItem('siga_username');
+      localStorage.removeItem('siga_roles');
+      localStorage.removeItem('siga_puede_ver_auditoria');
+      localStorage.removeItem('siga_userid');
+      if (window.location.pathname !== '/login') {
+        window.location.href = '/login';
+      }
     }
     return Promise.reject(error);
   }

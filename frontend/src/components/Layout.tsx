@@ -1,4 +1,5 @@
 import React from 'react';
+import { useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import Sidebar from './Sidebar';
 import Navbar from './Navbar';
@@ -10,8 +11,11 @@ interface LayoutProps {
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   const { user } = useAuth();
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
+  const location = useLocation();
 
-  if (!user) {
+  const isLoginPage = location.pathname === '/login';
+
+  if (!user || isLoginPage) {
     return <>{children}</>;
   }
 

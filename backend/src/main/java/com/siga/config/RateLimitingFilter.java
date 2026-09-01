@@ -20,23 +20,23 @@ public class RateLimitingFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         String uri = request.getRequestURI();
-        
+
         // Solo aplicar limites a endpoints de la API
         if (uri.startsWith("/api/")) {
             String ip = getClientIP(request);
 
             if (uri.equals("/api/v1/auth/login")) {
-                // Limite para login: 5 peticiones por minuto
-                TokenBucket bucket = loginBuckets.computeIfAbsent(ip, k -> new TokenBucket(5, 5, 60));
+                // Limite para login: 60 peticiones por minuto
+                TokenBucket bucket = loginBuckets.computeIfAbsent(ip, k -> new TokenBucket(60, 60, 60));
                 if (!bucket.tryConsume()) {
-                    sendErrorResponse(response, "Has superado el limite de intentos de inicio de sesion (5 por minuto).");
+                    sendErrorResponse(response, "Has superado el limite de intentos de inicio de sesion.");
                     return;
                 }
             } else {
-                // Limite para API general: 100 peticiones por minuto
-                TokenBucket bucket = apiBuckets.computeIfAbsent(ip, k -> new TokenBucket(100, 100, 60));
+                // Limite para API general: 600 peticiones por minuto
+                TokenBucket bucket = apiBuckets.computeIfAbsent(ip, k -> new TokenBucket(600, 600, 600));
                 if (!bucket.tryConsume()) {
-                    sendErrorResponse(response, "Has superado el limite de peticiones al servidor (100 por minuto).");
+                    sendErrorResponse(response, "Has superado el limite de peticiones al servidor.");
                     return;
                 }
             }

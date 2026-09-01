@@ -18,37 +18,38 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem('siga_token');
-    if (token) {
-      api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-      const id = Number(localStorage.getItem('siga_userid') || '0');
-      const username = localStorage.getItem('siga_username') || '';
-      const rolesStr = localStorage.getItem('siga_roles') || '[]';
-      const puedeVerAuditoria = localStorage.getItem('siga_puede_ver_auditoria') === 'true';
+    const restoreSession = async () => {
       try {
-        const roles = JSON.parse(rolesStr) as Role[];
-        setUser({ id, token, type: 'Bearer', username, roles, puedeVerAuditoria });
-      } catch {
+        const response = await api.get<AuthUser>('/auth/me');
+        setUser(response.data);
+      } catch (error: any) {
+        if (error.response?.status === 401 || error.response?.status === 403) {
+          localStorage.removeItem('siga_token');
+          localStorage.removeItem('siga_username');
+          localStorage.removeItem('siga_roles');
+          localStorage.removeItem('siga_puede_ver_auditoria');
+          localStorage.removeItem('siga_userid');
+        }
+        setUser(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+    restoreSession();
+  }, []);
+
+  const logout = useCallback(() => {
+    api.post('/auth/logout')
+      .catch((err) => console.error("Error during server logout", err))
+      .finally(() => {
         localStorage.removeItem('siga_token');
         localStorage.removeItem('siga_username');
         localStorage.removeItem('siga_roles');
         localStorage.removeItem('siga_puede_ver_auditoria');
         localStorage.removeItem('siga_userid');
-      }
-    }
-    setLoading(false);
-  }, []);
-
-  const logout = useCallback(() => {
-    api.post('/auth/logout').catch((err) => console.error("Error during server logout", err));
-    localStorage.removeItem('siga_token');
-    localStorage.removeItem('siga_username');
-    localStorage.removeItem('siga_roles');
-    localStorage.removeItem('siga_puede_ver_auditoria');
-    localStorage.removeItem('siga_userid');
-    delete api.defaults.headers.common['Authorization'];
-    setUser(null);
-    window.location.href = '/login';
+        setUser(null);
+        window.location.href = '/login';
+      });
   }, []);
 
   const login = useCallback((authUser: AuthUser) => {
@@ -57,9 +58,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.setItem('siga_username', authUser.username);
     localStorage.setItem('siga_roles', JSON.stringify(authUser.roles));
     localStorage.setItem('siga_puede_ver_auditoria', String(authUser.puedeVerAuditoria || false));
-    if (authUser.token) {
-      api.defaults.headers.common['Authorization'] = `Bearer ${authUser.token}`;
-    }
     setUser(authUser);
   }, []);
 
