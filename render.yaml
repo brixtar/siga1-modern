@@ -7,37 +7,16 @@ services:
     plan: free
     region: oregon
     envVars:
-      - key: DB_HOST
-        fromDatabase:
-          name: siga-db
-          property: host
-      - key: DB_PORT
-        fromDatabase:
-          name: siga-db
-          property: port
-      - key: DB_NAME
-        fromDatabase:
-          name: siga-db
-          property: database
-      - key: DB_USER
-        fromDatabase:
-          name: siga-db
-          property: user
-      - key: DB_PASSWORD
-        fromDatabase:
-          name: siga-db
-          property: password
+      # Conexión a Base de Datos Permanente (Neon.tech / PostgreSQL Perpetuo Gratuito)
+      - key: SPRING_DATASOURCE_URL
+        sync: false
+      - key: SPRING_DATASOURCE_USERNAME
+        sync: false
+      - key: SPRING_DATASOURCE_PASSWORD
+        sync: false
       - key: SPRING_JPA_HIBERNATE_DDL_AUTO
         value: update
       - key: SIGA_JWT_SECRET
         generateValue: true
       - key: JAVA_TOOL_OPTIONS
         value: "-Xms128m -Xmx384m -XX:+UseG1GC"
-
-databases:
-  # Base de datos PostgreSQL Gratuita en Render (Creada automáticamente)
-  - name: siga-db
-    databaseName: siga_db
-    user: siga
-    plan: free
-    region: oregon

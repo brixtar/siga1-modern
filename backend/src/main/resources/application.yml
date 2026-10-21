@@ -2,7 +2,7 @@ spring:
   application:
     name: siga-backend
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:siga_db}}
+    url: ${SPRING_DATASOURCE_URL:${DATABASE_URL:jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:siga_db}}}
     username: ${SPRING_DATASOURCE_USERNAME:${DB_USER:root}}
     password: ${SPRING_DATASOURCE_PASSWORD:${DB_PASSWORD:root}}
   jpa:
