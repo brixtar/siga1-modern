@@ -9,11 +9,11 @@ services:
     envVars:
       # Conexión a Base de Datos Permanente (Neon.tech / PostgreSQL Perpetuo Gratuito)
       - key: SPRING_DATASOURCE_URL
-        sync: false
+        value: "jdbc:postgresql://ep-still-mouse-b4j3q5us-pooler.c-6.us-east-2.aws.neon.tech:5432/neondb?sslmode=require"
       - key: SPRING_DATASOURCE_USERNAME
-        sync: false
+        value: "neondb_owner"
       - key: SPRING_DATASOURCE_PASSWORD
-        sync: false
+        value: "npg_lxksC5BJfD0W"
       - key: SPRING_JPA_HIBERNATE_DDL_AUTO
         value: update
       - key: SIGA_JWT_SECRET

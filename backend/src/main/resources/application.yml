@@ -2,9 +2,9 @@ spring:
   application:
     name: siga-backend
   datasource:
-    url: ${SPRING_DATASOURCE_URL:${DATABASE_URL:jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:siga_db}}}
-    username: ${SPRING_DATASOURCE_USERNAME:${DB_USER:root}}
-    password: ${SPRING_DATASOURCE_PASSWORD:${DB_PASSWORD:root}}
+    url: ${SPRING_DATASOURCE_URL:${DATABASE_URL:jdbc:postgresql://ep-still-mouse-b4j3q5us-pooler.c-6.us-east-2.aws.neon.tech:5432/neondb?sslmode=require}}
+    username: ${SPRING_DATASOURCE_USERNAME:neondb_owner}
+    password: ${SPRING_DATASOURCE_PASSWORD:npg_lxksC5BJfD0W}
   jpa:
     hibernate:
       ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:update}

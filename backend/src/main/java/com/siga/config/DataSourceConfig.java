@@ -12,6 +12,8 @@ import org.springframework.util.StringUtils;
 
 import javax.sql.DataSource;
 import java.net.URI;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 @Configuration
 @Slf4j
@@ -54,17 +56,25 @@ public class DataSourceConfig {
                         }
                     }
 
+                    // Limpiar query para compatibilidad JDBC (eliminar channel_binding, mantener sslmode)
+                    String cleanQuery = "sslmode=require";
+                    if (StringUtils.hasText(query)) {
+                        cleanQuery = Arrays.stream(query.split("&"))
+                                .filter(p -> !p.toLowerCase().startsWith("channel_binding"))
+                                .collect(Collectors.joining("&"));
+                        if (!cleanQuery.contains("sslmode")) {
+                            cleanQuery = cleanQuery.isEmpty() ? "sslmode=require" : cleanQuery + "&sslmode=require";
+                        }
+                    }
+
                     StringBuilder jdbcBuilder = new StringBuilder("jdbc:postgresql://")
                             .append(host)
                             .append(":")
                             .append(port)
-                            .append(path != null && !path.isEmpty() ? path : "/neondb");
+                            .append(path != null && !path.isEmpty() ? path : "/neondb")
+                            .append("?")
+                            .append(cleanQuery);
 
-                    if (StringUtils.hasText(query)) {
-                        jdbcBuilder.append("?").append(query);
-                    } else {
-                        jdbcBuilder.append("?sslmode=require");
-                    }
                     finalUrl = jdbcBuilder.toString();
                     log.info("[DataSourceConfig] URL convertida a JDBC compatible: {}", finalUrl.replaceAll(":[^/@]+@", ":***@"));
                 } catch (Exception e) {
