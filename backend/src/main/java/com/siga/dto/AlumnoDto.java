@@ -16,4 +16,5 @@ public class AlumnoDto {
     private String ciudad;
     private String telefonoCelular;
     private String telefonoFijo;
+    private String password;
 }

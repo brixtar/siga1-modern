@@ -119,7 +119,7 @@ Siga1-modern/
 | **DOCTOR** | Médico veterinario | Crear/editar consultas, derivaciones, retornos, exámenes. Ver animales y dueños. Editar su perfil. |
 | **ALUMNO** | Estudiante / ayudante | Ver consultas y asistir en creación. Editar su perfil. No puede eliminar datos. |
 
-> El primer usuario (`admin` / `admin123`) se crea automáticamente al iniciar la base de datos.
+> El primer usuario administrador (`admin_siga_chamical` / `S1gA#Adm!n2026$Ch4m`) se inicializa o migra automáticamente con credenciales robustas y protección CAPTCHA anti-bot.
 
 ---
 

@@ -33,7 +33,14 @@ public class AuthService {
     @Autowired
     private JwtUtils jwtUtils;
 
+    @Autowired
+    private CaptchaService captchaService;
+
     public LoginResponse authenticate(LoginRequest request) {
+        if (!captchaService.validateCaptcha(request.getCaptchaId(), request.getCaptchaAnswer())) {
+            throw new IllegalArgumentException("El código de seguridad CAPTCHA es incorrecto o ha expirado. Por favor, intente nuevamente.");
+        }
+
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authentication);

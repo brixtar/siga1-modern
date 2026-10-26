@@ -1,5 +1,11 @@
 export type Role = 'ADMIN' | 'DOCTOR' | 'ALUMNO';
 
+export interface CaptchaResponse {
+  captchaId: string;
+  captchaImage: string;
+  expiresInSeconds: number;
+}
+
 export interface AuthUser {
   id?: number;
   token: string;

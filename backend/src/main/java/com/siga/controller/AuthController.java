@@ -25,10 +25,18 @@ public class AuthController {
     private AuthService authService;
 
     @Autowired
+    private CaptchaService captchaService;
+
+    @Autowired
     private JwtUtils jwtUtils;
 
     @Value("${siga.jwt.cookie-secure:false}")
     private boolean cookieSecure;
+
+    @GetMapping("/captcha")
+    public ResponseEntity<com.siga.dto.CaptchaResponse> getCaptcha() {
+        return ResponseEntity.ok(captchaService.generateCaptcha());
+    }
 
     @GetMapping("/me")
     public ResponseEntity<?> getMe(Authentication authentication) {

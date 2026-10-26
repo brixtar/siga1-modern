@@ -60,7 +60,7 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
         if (allowedOrigins != null && !allowedOrigins.trim().isEmpty() && !allowedOrigins.equals("*")) {
             java.util.List<String> origins = java.util.Arrays.stream(allowedOrigins.split(","))
-                    .map(String::trim)
+                    .map(s -> s.trim())
                     .filter(s -> !s.isEmpty())
                     .toList();
             configuration.setAllowedOriginPatterns(origins);

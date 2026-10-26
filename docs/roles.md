@@ -166,9 +166,9 @@ Al iniciar el sistema por primera vez, se crea automáticamente:
 
 | Campo | Valor |
 |-------|-------|
-| Username | `admin` |
-| Email | `admin@siga.local` |
-| Password | `admin123` |
+| Username | `admin_siga_chamical` |
+| Email | `admin@siga.unlar.edu.ar` |
+| Password | `S1gA#Adm!n2026$Ch4m` |
 | Role | `ADMIN` |
 | Enabled | `true` |
 

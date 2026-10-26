@@ -33,8 +33,9 @@ Esto construye y levanta 3 contenedores:
 
 ### Primer login
 
-Usuario: `admin`  
-Contraseña: `admin123`
+Usuario: `admin_siga_chamical`  
+Contraseña: `S1gA#Adm!n2026$Ch4m`  
+*(Requiere completar el código visual anti-bot CAPTCHA en pantalla)*
 
 ### Detener
 

@@ -13,6 +13,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @Slf4j
 @Component
@@ -54,20 +56,31 @@ public class DataInitializer implements CommandLineRunner {
         try {
             log.info("[DataInitializer] Iniciando inicializacion de datos enriquecidos...");
 
-            // 1. Usuarios Base
-            User admin = seedUser("admin", "admin@siga.local", "admin123", Role.ADMIN);
-            User doc1User = seedUser("doctor", "doctor@siga.local", "doctor123", Role.DOCTOR);
-            User doc2User = seedUser("doctor2", "doctor2@siga.local", "doctor123", Role.DOCTOR);
-            User alu1User = seedUser("alumno", "alumno@siga.local", "alumno123", Role.ALUMNO);
-            User alu2User = seedUser("alumno2", "alumno2@siga.local", "alumno123", Role.ALUMNO);
+            // 1. Usuarios Base con Contraseñas Robustas y Migración Automática
+            User admin = seedOrMigrateUser("admin", "admin_siga_chamical", "admin@siga.unlar.edu.ar", "S1gA#Adm!n2026$Ch4m", Role.ADMIN, true);
+            User doc1User = seedOrMigrateUser("doctor", "doc_juan_perez", "jperez@siga.unlar.edu.ar", "D0ct0r#P3r3z!2026*Vet", Role.DOCTOR, true);
+            User doc2User = seedOrMigrateUser("doctor2", "doc_ana_gomez", "agomez@siga.unlar.edu.ar", "Dr4#G0m3z!9823$Med", Role.DOCTOR, false);
+            User alu1User = seedOrMigrateUser("alumno", "alu_lucas_silva", "lsilva@siga.unlar.edu.ar", "Alu#S!lv4_8841#Uni", Role.ALUMNO, false);
+            User alu2User = seedOrMigrateUser("alumno2", "alu_sofia_mtz", "smartinez@siga.unlar.edu.ar", "Alu#M4rt!n3z_7766#Un", Role.ALUMNO, false);
+
+            // Inutilizar definitivamente cualquier cuenta residual con credenciales débiles
+            List<String> legacyNames = List.of("admin", "doctor", "doctor2", "alumno", "alumno2");
+            for (String legacyName : legacyNames) {
+                userRepository.findByUsername(legacyName).ifPresent(legacyUser -> {
+                    log.warn("[DataInitializer] Deshabilitando cuenta legacy obsoleta residual: {}", legacyName);
+                    legacyUser.setEnabled(false);
+                    legacyUser.setPassword(passwordEncoder.encode("DISABLED_" + UUID.randomUUID()));
+                    userRepository.save(legacyUser);
+                });
+            }
 
             // 2. Doctores
-            Doctor doc1 = seedDoctor(doc1User, "11111111", "Juan", "Perez", "doctor@siga.local", "MP-1024");
-            Doctor doc2 = seedDoctor(doc2User, "22222222", "Ana", "Gomez", "doctor2@siga.local", "MP-2048");
+            Doctor doc1 = seedDoctor(doc1User, "11111111", "Juan", "Perez", "jperez@siga.unlar.edu.ar", "MP-1024");
+            Doctor doc2 = seedDoctor(doc2User, "22222222", "Ana", "Gomez", "agomez@siga.unlar.edu.ar", "MP-2048");
 
             // 3. Alumnos
-            Alumno alu1 = seedAlumno(alu1User, "33333333", "Lucas", "Silva", "alumno@siga.local", "AL-9988");
-            Alumno alu2 = seedAlumno(alu2User, "44444444", "Sofia", "Martinez", "alumno2@siga.local", "AL-7766");
+            Alumno alu1 = seedAlumno(alu1User, "33333333", "Lucas", "Silva", "lsilva@siga.unlar.edu.ar", "AL-9988");
+            Alumno alu2 = seedAlumno(alu2User, "44444444", "Sofia", "Martinez", "smartinez@siga.unlar.edu.ar", "AL-7766");
 
             // 4. Especies y Razas
             Especie perro = seedEspecie("Perro");
@@ -178,22 +191,55 @@ public class DataInitializer implements CommandLineRunner {
         }
     }
 
-    private User seedUser(String username, String email, String password, Role role) {
-        if (!userRepository.existsByUsername(username)) {
-            User user = User.builder()
-                    .username(username)
-                    .email(email)
-                    .password(passwordEncoder.encode(password))
-                    .role(role)
-                    .enabled(true)
-                    .build();
+    private User seedOrMigrateUser(String legacyUsername, String newUsername, String newEmail, String newPassword, Role role, boolean puedeVerAuditoria) {
+        // 1. Si ya existe el nuevo usuario seguro, asegurar rol, email y estado
+        Optional<User> existingNew = userRepository.findByUsername(newUsername);
+        if (existingNew.isPresent()) {
+            User user = existingNew.get();
+            user.setEmail(newEmail);
+            user.setRole(role);
+            user.setPuedeVerAuditoria(puedeVerAuditoria);
+            user.setEnabled(true);
             return userRepository.save(user);
         }
-        return userRepository.findByUsername(username).orElse(null);
+
+        // 2. Si existe la cuenta legacy anterior (ej. "admin", "doctor"), migrarla in-situ preservando su ID y relaciones
+        if (legacyUsername != null) {
+            Optional<User> legacy = userRepository.findByUsername(legacyUsername);
+            if (legacy.isPresent()) {
+                User user = legacy.get();
+                log.info("[DataInitializer] Migrando cuenta legacy '{}' a nuevo usuario robusto '{}'...", legacyUsername, newUsername);
+                user.setUsername(newUsername);
+                user.setEmail(newEmail);
+                user.setPassword(passwordEncoder.encode(newPassword));
+                user.setRole(role);
+                user.setPuedeVerAuditoria(puedeVerAuditoria);
+                user.setEnabled(true);
+                return userRepository.save(user);
+            }
+        }
+
+        // 3. Si no existe ninguno, crear de cero
+        log.info("[DataInitializer] Creando nuevo usuario seguro '{}'...", newUsername);
+        User user = User.builder()
+                .username(newUsername)
+                .email(newEmail)
+                .password(passwordEncoder.encode(newPassword))
+                .role(role)
+                .puedeVerAuditoria(puedeVerAuditoria)
+                .enabled(true)
+                .build();
+        return userRepository.save(user);
     }
 
     private Doctor seedDoctor(User user, String dni, String nombre, String apellido, String email, String matricula) {
-        if (user != null && !doctorRepository.findByUserId(user.getId()).isPresent()) {
+        if (user != null) {
+            Optional<Doctor> existing = doctorRepository.findByUserId(user.getId());
+            if (existing.isPresent()) {
+                Doctor doc = existing.get();
+                doc.setEmail(email);
+                return doctorRepository.save(doc);
+            }
             Doctor doc = Doctor.builder()
                     .user(user)
                     .dni(dni)
@@ -204,11 +250,17 @@ public class DataInitializer implements CommandLineRunner {
                     .build();
             return doctorRepository.save(doc);
         }
-        return doctorRepository.findByUserId(user.getId()).orElse(null);
+        return null;
     }
 
     private Alumno seedAlumno(User user, String dni, String nombre, String apellido, String email, String matricula) {
-        if (user != null && !alumnoRepository.findByUserId(user.getId()).isPresent()) {
+        if (user != null) {
+            Optional<Alumno> existing = alumnoRepository.findByUserId(user.getId());
+            if (existing.isPresent()) {
+                Alumno alu = existing.get();
+                alu.setEmail(email);
+                return alumnoRepository.save(alu);
+            }
             Alumno alu = Alumno.builder()
                     .user(user)
                     .dni(dni)
@@ -219,7 +271,7 @@ public class DataInitializer implements CommandLineRunner {
                     .build();
             return alumnoRepository.save(alu);
         }
-        return alumnoRepository.findByUserId(user.getId()).orElse(null);
+        return null;
     }
 
     private Especie seedEspecie(String nombreEspecie) {

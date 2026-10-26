@@ -17,8 +17,10 @@ Iniciar sesión.
 **Request:**
 ```json
 {
-  "username": "admin",
-  "password": "admin123"
+  "username": "admin_siga_chamical",
+  "password": "S1gA#Adm!n2026$Ch4m",
+  "captchaId": "c8b417e2-419b-4395-827a-5dbb9cfb7ef8",
+  "captchaAnswer": "A7X9K"
 }
 ```
 

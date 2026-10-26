@@ -42,7 +42,10 @@ public class AlumnoService {
         User user = new User();
         user.setUsername(dto.getUsername());
         user.setEmail(dto.getEmail());
-        user.setPassword(passwordEncoder.encode("alumno123"));
+        String initialPassword = (dto.getPassword() != null && !dto.getPassword().isBlank())
+                ? dto.getPassword()
+                : "Alu#" + dto.getUsername() + "!2026";
+        user.setPassword(passwordEncoder.encode(initialPassword));
         user.setRole(Role.ALUMNO);
         user.setEnabled(true);
         user = userRepository.save(user);

@@ -5,9 +5,15 @@ import lombok.Data;
 
 @Data
 public class LoginRequest {
-    @NotBlank
+    @NotBlank(message = "El nombre de usuario es obligatorio")
     private String username;
 
-    @NotBlank
+    @NotBlank(message = "La contraseña es obligatoria")
     private String password;
+
+    @NotBlank(message = "El identificador de CAPTCHA es obligatorio")
+    private String captchaId;
+
+    @NotBlank(message = "El código de verificación CAPTCHA es obligatorio")
+    private String captchaAnswer;
 }

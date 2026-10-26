@@ -125,6 +125,6 @@ Para probar y ver los cambios aplicados en vivo en tu navegador:
 
 | Rol | Usuario | Contraseña | Permisos / Reglas |
 | :--- | :--- | :--- | :--- |
-| **Administrador** | `admin` | `admin123` | Control total, gestión de usuarios (CRUD), edición de especies, razas, farmacia y auditorías de seguridad. |
-| **Médico (Doctor)** | `doctor` | `doctor123` | Gestión de consultas y recetas, inventario de medicamentos y agenda semanal. Permiso de auditoría asignable por el admin. |
-| **Alumno** | `alumno` | `alumno123` | Registro y visualización de consultas, consulta de turnos, y consulta de animales/dueños en formato de **Solo Lectura** (Revisión). |
+| **Administrador** | `admin_siga_chamical` | `S1gA#Adm!n2026$Ch4m` | Control total, gestión de usuarios (CRUD), edición de especies, razas, farmacia y auditorías de seguridad. |
+| **Médico (Doctor)** | `doc_juan_perez` | `D0ct0r#P3r3z!2026*Vet` | Gestión de consultas y recetas, inventario de medicamentos y agenda semanal. Permiso de auditoría asignable por el admin. |
+| **Alumno** | `alu_lucas_silva` | `Alu#S!lv4_8841#Uni` | Registro y visualización de consultas, consulta de turnos, y consulta de animales/dueños en formato de **Solo Lectura** (Revisión). |
